@@ -1,0 +1,17 @@
+name: ShopGUIPlus-Dynamics
+version: 1.0.0-SNAPSHOT
+main: org.voxelhorizons.shopdynamics.DynamicsPlugin
+api-version: '1.21'
+author: VoxelHorizons
+description: Rotating inventory addon for ShopGUI+
+depend: [ShopGUIPlus]
+commands:
+  shopdynamics:
+    description: Manage rotating shop stock
+    aliases: [dynamics]
+    usage: /shopdynamics <status|rotate|reload>
+    permission: shopdynamics.admin
+permissions:
+  shopdynamics.admin:
+    description: View status, rotate stock, and reload configuration
+    default: op
