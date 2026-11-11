@@ -1,0 +1,25 @@
+# ShopGUIPlus-Dynamics - default layout matches the 5 x 4 item grid.
+enabled: true
+
+rotation:
+  # "minecraft-day" follows a world's full 24000-tick day; "real-time" uses wall-clock minutes.
+  mode: minecraft-day
+  world: world
+  interval-days: 1
+  real-time-minutes: 20
+  check-interval-ticks: 100
+  # Prefer not to show an item on consecutive rotations when alternatives exist.
+  avoid-previous: true
+  # Only close menus with titles matching managed ShopGUI+ shops on rotation.
+  close-open-shops: true
+
+shops:
+  # Automatically manage all shops with more entries than the available slots.
+  auto: true
+  # If auto is false, only shops in include are managed (even if they have <= 20 entries).
+  include: []
+  exclude: []
+  # Zero-based chest inventory indices; 5 columns x 4 rows = 20 sell/buy slots.
+  slots: [2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 29, 30, 31, 32, 33]
+  # ShopGUI+ controls inventory size; Dynamics never changes it.
+  # Edit the GUI size in ShopGUI+'s own configuration, not here.
