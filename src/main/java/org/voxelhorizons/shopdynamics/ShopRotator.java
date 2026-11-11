@@ -83,7 +83,7 @@ public final class ShopRotator {
     /** Rebind after ShopGUI+ has (re)loaded its original shop definitions. */
     public void bind() {
         restore();
-        if (!settings.enabled || !canBind()) return;
+        if (!settings.enabled() || !canBind()) return;
         try {
             for (Shop shop : ShopGuiPlusApi.getPlugin().getShopManager().getShops()) {
                 List<ShopItem> original = new ArrayList<>(shop.getShopItems());
@@ -198,7 +198,7 @@ public final class ShopRotator {
 
     /** Called on the main thread at the configured tick interval. */
     public void checkClock() {
-        if (!settings.enabled || !bound || managed.isEmpty()) return;
+        if (!settings.enabled() || !bound || managed.isEmpty()) return;
         if (settings.mode() == RotationSettings.Mode.MINECRAFT_DAY) {
             World world = Bukkit.getWorld(settings.world());
             if (world == null) {
