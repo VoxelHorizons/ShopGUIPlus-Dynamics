@@ -20,7 +20,7 @@ For example, a Blacksmith shop with **53 configured entries** can display **20 r
 2. Install **ShopGUI+** and **ShopGUIPlus-Dynamics** on a 1.21+ Paper server (including 26.3, subject to normal ShopGUI+ compatibility).
 3. Start once to create `plugins/ShopGUIPlus-Dynamics/config.yml`; restart/reload after configuring.
 4. Keep **all** 53 Blacksmith entries in your existing `plugins/ShopGUIPlus/shops/blacksmith.yml`, including page-2 entries. The addon reads the live ShopGUI+ catalogue and displays just the chosen 20.
-5. Ensure ShopGUI+'s shop menu buttons and fixed entries do **not** occupy the reserved 20 slots. The default layout is **36 slots** (four rows), using the 5 × 4 grid in the new texture. Customize `shops.slots` if your bitmap uses a different layout.
+5. Ensure ShopGUI+'s shop menu buttons and fixed entries do **not** occupy the reserved 20 slots. Dynamics **never changes the ShopGUI+ inventory size**; the 5 × 4 grid is only a list of item positions. Customize `shops.slots` if the bitmap uses a different layout.
 6. Verify with `/shopdynamics status`, then `/shopdynamics rotate blacksmith` to test. Use `/shopdynamics reload` after editing **the addon's** config. Use `/shop reload` when changing original ShopGUI+ shop definitions.
 
 **Default 20 inventory slot indices:** (zero-based)
@@ -51,13 +51,12 @@ shops:
   include: []
   exclude: []
   slots: [2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 29, 30, 31, 32, 33]
-  inventory-size: 36
 ```
 
 - **Minecraft-day mode:** a day is 24,000 **world full-time ticks** (20 real minutes at 20 TPS, with normal daylight cycle). Change `rotation.world` to the relevant Multiverse world. Rotation occurs when this world's full-day number advances by `interval-days`. `/time set` and daylight-cycle changes affect the schedule. All managed shops share the clock.
 - **Real-time mode:** set `rotation.mode: real-time`; `real-time-minutes` controls elapsed wall-clock minutes, and deadlines persist across restarts. On restart after a missed deadline, the next check rotates once rather than fast-forwarding through every missed period.
 - **Automatic shops:** `auto: true` manages any shop with **more trading entries than configured slots**. Add IDs to `exclude` to opt out. `include` explicitly manages named shops even with a small catalogue. Set `auto: false` to manage only `include`.
-- **Layout:** customize `shops.slots` with distinct, valid zero-based indexes. Set `inventory-size: -1` to retain the original ShopGUI+ size instead of applying a four-row size. Fixed shop entries must not overlap these slots.
+- **Layout:** customize `shops.slots` with distinct, valid zero-based indexes. Inventory size comes exclusively from ShopGUI+. Fixed shop entries must not overlap the configured item slots. An out-of-bounds item slot skips the shop with a warning; it never changes its size.
 
 ## Commands
 
@@ -72,6 +71,7 @@ Alias: `/dynamics`. Permission: `shopdynamics.admin` (operators by default). Sho
 ## Safety and limitations
 
 - Source shop files are never rewritten. **Do not delete page-2 catalogue entries** to make them fit.
+- **Inventory dimensions are always controlled by ShopGUI+.** Dynamics does not call `Shop#setSize` or infer a new row count from its item slots. An existing `shops.inventory-size` key from the initial addon release is now ignored; remove it from the addon config for clarity. A full server restart after upgrading is recommended so ShopGUI+ recreates its original shop sizes.
 - Rotating trade items are `type: item` entries. Non-item entries stay fixed; colliding slots or invalid layouts cause a shop to be **skipped with a warning** rather than silently overwriting existing controls.
 - A rotation closes currently open inventories **only when their visible title matches that shop's title**. Custom title transformations might prevent matching; players should reopen the shop after a rotation.
 - Because unavailable items are not in ShopGUI+'s loaded catalogue, the change affects ShopGUI+ trading/lookup behaviour, not just the visual GUI. Check any external plugins that cache shop item lists.

@@ -10,7 +10,7 @@ import java.util.Set;
 public record RotationSettings(
     boolean enabled, Mode mode, String world, int intervalDays, long realTimeMillis,
     long checkTicks, boolean avoidPrevious, boolean closeOpenShops,
-    boolean automatic, Set<String> include, Set<String> exclude, List<Integer> slots, int inventorySize
+    boolean automatic, Set<String> include, Set<String> exclude, List<Integer> slots
 ) {
     public enum Mode { MINECRAFT_DAY, REAL_TIME }
 
@@ -36,12 +36,8 @@ public record RotationSettings(
         if (slots.isEmpty() || slots.size() > 54 || new HashSet<>(slots).size() != slots.size()) {
             throw new IllegalArgumentException("shops.slots requires 1 to 54 distinct inventory indexes");
         }
-        int inventorySize = config.getInt("shops.inventory-size", -1);
-        if (inventorySize != -1 && (inventorySize < 9 || inventorySize > 54 || inventorySize % 9 != 0)) {
-            throw new IllegalArgumentException("shops.inventory-size must be -1 or a multiple of 9 from 9 to 54");
-        }
         for (int slot : slots) {
-            if (slot < 0 || slot >= (inventorySize == -1 ? 54 : inventorySize)) {
+            if (slot < 0 || slot >= 54) {
                 throw new IllegalArgumentException("invalid shop item slot " + slot);
             }
         }
@@ -50,7 +46,7 @@ public record RotationSettings(
             config.getBoolean("rotation.avoid-previous", true),
             config.getBoolean("rotation.close-open-shops", true),
             config.getBoolean("shops.auto", true), Set.copyOf(config.getStringList("shops.include")),
-            Set.copyOf(config.getStringList("shops.exclude")), List.copyOf(slots), inventorySize);
+            Set.copyOf(config.getStringList("shops.exclude")), List.copyOf(slots));
     }
 
     public boolean manages(String shopId, int count) {

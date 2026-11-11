@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
@@ -41,14 +40,12 @@ public final class ShopRotator {
         final List<ShopItem> trade;
         final List<ShopItem> fixed;
         final IdentityHashMap<ShopItem, Position> positions;
-        final int size;
 
         ManagedShop(Shop shop, List<ShopItem> all, List<ShopItem> trade, List<ShopItem> fixed) {
             this.shop = shop;
             this.all = all;
             this.trade = trade;
             this.fixed = fixed;
-            this.size = shop.getSize();
             this.positions = new IdentityHashMap<>();
             for (ShopItem entry : all) {
                 positions.put(entry, new Position(entry.getPage(), entry.getSlot()));
@@ -61,7 +58,6 @@ public final class ShopRotator {
                 entry.getKey().setSlot(entry.getValue().slot());
             }
             shop.setShopItems(new ArrayList<>(all));
-            shop.setSize(size);
         }
     }
 
@@ -95,7 +91,8 @@ public final class ShopRotator {
                 }
                 if (!settings.manages(shop.getId(), trade.size())) continue;
 
-                int size = settings.inventorySize() == -1 ? shop.getSize() : settings.inventorySize();
+                // ShopGUI+ is the sole owner of inventory geometry. Never resize its menus.
+                int size = shop.getSize();
                 if (settings.slots().stream().anyMatch(slot -> slot >= size)) {
                     plugin.getLogger().warning("Skipping " + shop.getId() + ": item slots exceed inventory size " + size);
                     continue;
@@ -105,7 +102,7 @@ public final class ShopRotator {
                     continue;
                 }
                 if (fixed.stream().anyMatch(i -> i.getSlot() >= size)) {
-                    plugin.getLogger().warning("Skipping " + shop.getId() + ": a permanent entry exceeds new inventory size");
+                    plugin.getLogger().warning("Skipping " + shop.getId() + ": a permanent entry exceeds ShopGUI+ inventory size");
                     continue;
                 }
                 Set<String> ids = new HashSet<>();
@@ -182,7 +179,6 @@ public final class ShopRotator {
             item.setSlot(settings.slots().get(index));
             live.add(item);
         }
-        if (settings.inventorySize() != -1) m.shop.setSize(settings.inventorySize());
         m.shop.setShopItems(live);
     }
 
